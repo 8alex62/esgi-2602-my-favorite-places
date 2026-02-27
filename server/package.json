@@ -4,14 +4,16 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "dev": "nodemon src/index.ts"
+    "dev": "nodemon src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js"
   },
   "dependencies": {
     "argon2": "^0.44.0",
     "axios": "^1.13.5",
-    "better-sqlite3": "^12.6.2",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
+    "pg": "^8.19.0",
     "typeorm": "^0.3.28"
   },
   "devDependencies": {
