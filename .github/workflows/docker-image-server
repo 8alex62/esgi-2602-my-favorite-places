@@ -3,6 +3,8 @@ name: Docker Image CI
 on:
   push:
     branches: [ "main" ]
+    paths:
+      - 'server/**'
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}-server
