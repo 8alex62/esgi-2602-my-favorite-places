@@ -8,6 +8,11 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 jobs:
   build:
+    permissions:
+      packages: write
+      contents: read
+      attestations: write
+      id-token: write
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
