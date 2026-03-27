@@ -1,37 +1,56 @@
-services:
-  db:
-    image: postgres
-    restart: unless-stopped
-    networks:
-      - net
-    volumes:
-       - db-data:/var/lib/postgresql
-    environment:
-      POSTGRES_PASSWORD: supersecretpassword
+name: Docker Images CI dev
 
-  adminer:
-    image: adminer
-    restart: unless-stopped
-    ports:
-      - 8080:8080
-    networks:
-      - net
+on:
+  push:
+    branches: [ "dev" ]
 
-  api:
-    build: .
-    networks:
-      - net
-    depends_on:
-      - db
-    restart: unless-stopped
-    ports:
-      - 3000:3000
+env:
+  REGISTRY: ghcr.io
+  REPO: ${{ github.repository }}
 
-networks:
-  net:
-    driver: bridge
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - name: client
+            context: ./client
+            file: ./client/Dockerfile
+            image_suffix: client-dev
+          - name: server
+            context: ./server
+            file: ./server/Dockerfile
+            image_suffix: server-dev
 
-volumes:
-  db-data:
+    permissions:
+      packages: write
+      contents: read
 
+    steps:
+      - uses: actions/checkout@v4
 
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.REPO }}-${{ matrix.image_suffix }}
+          tags: |
+            type=raw,value=dev
+            type=sha,prefix=sha-
+
+      - name: Build and push ${{ matrix.name }}
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ matrix.context }}
+          file: ${{ matrix.file }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
