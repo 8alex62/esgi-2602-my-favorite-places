@@ -6,14 +6,19 @@
   "scripts": {
     "dev": "nodemon src/index.ts",
     "build": "tsc",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "test": "npx jest"
   },
   "dependencies": {
+    "@babel/preset-env": "^7.29.2",
+    "@babel/preset-typescript": "^7.28.5",
+    "@types/jest": "^30.0.0",
     "argon2": "^0.44.0",
     "axios": "^1.13.5",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
     "pg": "^8.19.0",
+    "ts-jest": "^29.4.6",
     "typeorm": "^0.3.28"
   },
   "devDependencies": {
