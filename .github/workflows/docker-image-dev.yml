@@ -66,7 +66,7 @@ jobs:
         run: npm test
 
   build-client:
-    needs: test-client   # 👈 attend les tests client
+    needs: test-client
     if: needs.changes.outputs.client == 'true' || needs.changes.outputs.ci == 'true'
     runs-on: ubuntu-latest
     permissions:
@@ -97,7 +97,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
 
   build-server:
-    needs: test-server   # 👈 attend les tests server
+    needs: test-server
     if: needs.changes.outputs.server == 'true' || needs.changes.outputs.ci == 'true'
     runs-on: ubuntu-latest
     permissions:
@@ -126,3 +126,40 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          
+  generate-docs:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Install client dependencies
+        working-directory: ./client
+        run: yarn install --frozen-lockfile
+
+      - name: Generate client docs
+        working-directory: ./client
+        run: npx typedoc --tsconfig tsconfig.app.json --entryPointStrategy expand --entryPoints src --out ../docs-artifacts/client
+
+      - name: Install server dependencies
+        working-directory: ./server
+        run: npm ci
+
+      - name: Generate server docs
+        working-directory: ./server
+        run: npx typedoc --skipErrorChecking --tsconfig tsconfig.json --entryPointStrategy expand --entryPoints src --out ../docs-artifacts/server
+
+      - name: Upload docs artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: generated-docs-${{ github.run_id }}-${{ github.sha }}
+          path: docs-artifacts
