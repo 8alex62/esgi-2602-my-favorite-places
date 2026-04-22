@@ -3,11 +3,7 @@ name: Documentation CI
 on:
   push:
     branches: [ "dev" ]
-    paths:
-      - 'client/**'
-      - 'server/**'
-      - '.github/workflows/docs.yml'
-
+    
 jobs:
   generate-docs:
     runs-on: ubuntu-latest
