@@ -2,6 +2,7 @@ name: Documentation CI
 
 on:
   push:
+    branches: ["dev"]
     paths:
       - 'client/**'
       - 'server/**'
