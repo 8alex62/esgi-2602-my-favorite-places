@@ -7,7 +7,7 @@
     "dev": "nodemon src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
-    "test": "npx jest"
+    "test": "npx jest --testPathPatterns=\"__tests__/.*\\.ts$\" --testPathIgnorePatterns=\"__tests__/.*\\.d\\.ts$\""
   },
   "dependencies": {
     "@babel/preset-env": "^7.29.2",
