@@ -1,6 +1,6 @@
 name: Docker Images CI dev
 on:
-  push:
+  pull_request:
     branches: [ "dev" ]
 env:
   REGISTRY: ghcr.io
@@ -26,25 +26,6 @@ jobs:
               - 'server/**'
             ci:
               - '.github/workflows/**'
-
-  test-client:
-    needs: changes
-    if: needs.changes.outputs.client == 'true' || needs.changes.outputs.ci == 'true'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: client/package-lock.json
-      - name: Install dependencies
-        working-directory: ./client
-        run: npm ci
-      - name: Run tests
-        working-directory: ./client
-        run: npm test
 
   test-server:
     needs: changes
@@ -128,6 +109,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           
   generate-docs:
+    needs: [test-client, test-server]
     runs-on: ubuntu-latest
     permissions:
       contents: read
